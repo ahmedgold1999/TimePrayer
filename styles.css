@@ -1318,3 +1318,155 @@ body {
     }
 }
 
+
+/* تنسيقات التقويم الشهري */
+.monthly-calendar {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.prayer-times-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Cairo', sans-serif;
+}
+
+.prayer-times-table th {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 2px solid #45a049;
+}
+
+.prayer-times-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.prayer-times-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.prayer-times-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.date-cell {
+    text-align: right !important;
+    padding: 10px 15px !important;
+    min-width: 120px;
+}
+
+.gregorian-date {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.hijri-date {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.error-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #e74c3c;
+    background: #fdf2f2;
+    border-radius: 12px;
+    border: 1px solid #fadbd8;
+}
+
+.error-message p {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+/* تنسيقات متجاوبة للتقويم */
+@media (max-width: 768px) {
+    .prayer-times-table {
+        font-size: 0.8rem;
+    }
+    
+    .prayer-times-table th,
+    .prayer-times-table td {
+        padding: 8px 5px;
+    }
+    
+    .date-cell {
+        min-width: 100px;
+        padding: 8px 10px !important;
+    }
+    
+    .gregorian-date {
+        font-size: 0.85rem;
+    }
+    
+    .hijri-date {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .monthly-calendar {
+        margin: 10px -15px;
+    }
+    
+    .prayer-times-table {
+        font-size: 0.7rem;
+        border-radius: 0;
+    }
+    
+    .prayer-times-table th,
+    .prayer-times-table td {
+        padding: 6px 3px;
+    }
+    
+    .date-cell {
+        min-width: 80px;
+        padding: 6px 8px !important;
+    }
+    
+    .gregorian-date {
+        font-size: 0.75rem;
+    }
+    
+    .hijri-date {
+        font-size: 0.65rem;
+    }
+}
+
+/* تنسيقات الثيمات للتقويم */
+[data-theme="ocean"] .prayer-times-table th {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-bottom-color: #2980b9;
+}
+
+[data-theme="sunset"] .prayer-times-table th {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    border-bottom-color: #d35400;
+}
+
+[data-theme="forest"] .prayer-times-table th {
+    background: linear-gradient(135deg, #27ae60, #229954);
+    border-bottom-color: #229954;
+}
+
+[data-theme="royal"] .prayer-times-table th {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    border-bottom-color: #7d3c98;
+}
+
