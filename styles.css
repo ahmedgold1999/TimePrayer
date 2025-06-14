@@ -861,196 +861,40 @@ body {
     box-shadow: 0 6px 20px rgba(46, 125, 50, 0.3);
 }
 
-.new-dua-btn i {
-    font-size: 0.9rem;
-}
-
-/* تذييل الصفحة */
-.footer {
-    background: var(--text-color);
-    color: white;
-    text-align: center;
-    padding: 30px 0;
-    margin-top: 50px;
-}
-
-.footer p {
-    margin-bottom: 10px;
-}
-
-.footer a {
-    color: var(--secondary-color);
-    text-decoration: none;
-}
-
-.footer a:hover {
-    text-decoration: underline;
-}
-
-/* التصميم المتجاوب */
-@media (max-width: 768px) {
-    .container {
-        padding: 0 15px;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-    
-    .logo h1 {
-        font-size: 1.5rem;
-    }
-    
-    .search-container {
-        max-width: 100%;
-    }
-    
-    .current-time {
-        font-size: 1rem;
-    }
-    
-    .location-card {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .prayer-times-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 15px;
-    }
-    
-    .prayer-card {
-        padding: 20px;
-    }
-    
-    .prayer-icon {
-        font-size: 2.5rem;
-    }
-    
-    .prayer-name {
-        font-size: 1.2rem;
-    }
-    
-    .prayer-time {
-        font-size: 1.6rem;
-    }
-    
-    .next-prayer-details {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .feature-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .feature-btn {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
-    }
-    
-    .player-controls {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .progress-container {
-        width: 100%;
-    }
-    
-    .modal-content {
-        margin: 20px;
-    }
-    
-    .modal-footer {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 480px) {
-    .section-title {
-        font-size: 1.8rem;
-    }
-    
-    .location-info h2 {
-        font-size: 1.5rem;
-    }
-    
-    .hadith-content p,
-    .dua-content p {
-        font-size: 1.1rem;
-    }
-    
-    .countdown span {
-        font-size: 1.5rem;
-    }
-    
-    .prayer-times-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* طباعة */
 @media print {
-    body {
-        background: white;
-        color: black;
+    body * {
+        visibility: hidden;
     }
-    
-    .modal,
-    .search-container,
-    .additional-features,
-    .print-section,
-    .quran-section,
-    .dua-section,
-    .footer {
-        display: none;
+    .printable-area, .printable-area * {
+        visibility: visible;
     }
-    
-    .header {
-        background: white;
-        color: black;
-        box-shadow: none;
-        border-bottom: 2px solid black;
+    .printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
     }
-    
-    .prayer-card {
-        border: 1px solid black;
-        box-shadow: none;
+    .header, .additional-features, .hadith-section, .quran-section, .dua-section, .modal {
+        display: none !important;
     }
-    
-    .next-prayer {
-        background: white;
-        color: black;
-        border: 2px solid black;
+    .main {
+        padding: 0 !important;
+    }
+    .location-section, .prayer-times-section {
+        margin-bottom: 0 !important;
+    }
+    .location-card, .prayer-card, .next-prayer {
+        box-shadow: none !important;
+        border: 1px solid #eee !important;
+    }
+    .prayer-times-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .calendar-table {
+        font-size: 0.8em;
     }
 }
 
-/* إخفاء النافذة المنبثقة */
-.modal.hidden {
-    display: none;
-}
-
-/* تأثيرات التحميل */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
 
