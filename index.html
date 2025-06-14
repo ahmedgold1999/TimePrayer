@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مواقيت الصلاة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- نافذة طلب الموقع -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-map-marker-alt"></i>
+                <h2>تحديد موقعك</h2>
+            </div>
+            <div class="modal-body">
+                <p>يحتاج الموقع إلى معرفة موقعك لعرض مواقيت الصلاة الدقيقة لمنطقتك</p>
+            </div>
+            <div class="modal-footer">
+                <button id="allowLocation" class="btn btn-primary">
+                    <i class="fas fa-check"></i>
+                    السماح
+                </button>
+                <button id="denyLocation" class="btn btn-secondary">
+                    <i class="fas fa-times"></i>
+                    رفض
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- رأس الصفحة -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-mosque"></i>
+                    <h1>مواقيت الصلاة</h1>
+                </div>
+                
+                <!-- حقل البحث عن المدن -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="citySearch" placeholder="ابحث عن مدينة...">
+                        <div id="searchSuggestions" class="search-suggestions"></div>
+                    </div>
+                </div>
+                
+                <div class="current-time" id="currentTime"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="main">
+        <div class="container">
+            <!-- عرض الموقع الحالي -->
+            <section class="location-section">
+                <div class="location-card" id="locationCard">
+                    <div class="location-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="location-info">
+                        <h2 id="cityName">جاري تحديد الموقع...</h2>
+                        <p id="countryName"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- مواقيت الصلاة -->
+            <section class="prayer-times-section">
+                <h2 class="section-title">مواقيت الصلاة اليوم</h2>
+                <div class="prayer-times-grid" id="prayerTimesGrid">
+                    <!-- سيتم ملء مواقيت الصلاة هنا بواسطة JavaScript -->
+                </div>
+                <div class="next-prayer" id="nextPrayer">
+                    <div class="next-prayer-info">
+                        <h3>الصلاة القادمة</h3>
+                        <div class="next-prayer-details">
+                            <span id="nextPrayerName">الفجر</span>
+                            <span id="nextPrayerTime">05:30</span>
+                        </div>
+                        <div class="countdown" id="countdown">
+                            <span id="countdownTime">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- أزرار الميزات الإضافية -->
+            <section class="additional-features">
+                <div class="feature-buttons">
+                    <button id="monthlyCalendarBtn" class="feature-btn">
+                        <i class="fas fa-calendar-alt"></i>
+                        عرض مواقيت الشهر
+                    </button>
+                    <button id="nearbyCitiesBtn" class="feature-btn">
+                        <i class="fas fa-map"></i>
+                        المدن القريبة
+                    </button>
+                </div>
+                
+                <!-- جدول المواقيت الشهرية (مخفي مبدئياً) -->
+                <div id="monthlyCalendar" class="monthly-calendar hidden">
+                    <div class="calendar-header">
+                        <h3>مواقيت الصلاة لشهر <span id="currentMonth"></span></h3>
+                        <button id="closeCalendar" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-content" id="calendarContent">
+                        <!-- سيتم ملء الجدول هنا -->
+                    </div>
+                </div>
+                
+                <!-- قائمة المدن القريبة (مخفية مبدئياً) -->
+                <div id="nearbyCities" class="nearby-cities hidden">
+                    <div class="cities-header">
+                        <h3>المدن القريبة</h3>
+                        <button id="closeCities" class="close-btn">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="cities-content" id="citiesContent">
+                        <!-- سيتم ملء القائمة هنا -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- زر الطباعة -->
+            <section class="print-section">
+                <button id="printBtn" class="print-btn">
+                    <i class="fas fa-print"></i>
+                    طباعة المواقيت
+                </button>
+            </section>
+
+            <!-- الحديث الشريف -->
+            <section class="hadith-section">
+                <div class="hadith-card" id="hadithCard">
+                    <div class="hadith-header">
+                        <i class="fas fa-quote-right"></i>
+                        <h3>حديث شريف</h3>
+                    </div>
+                    <div class="hadith-content">
+                        <p id="hadithText">جاري تحميل الحديث...</p>
+                        <div class="hadith-source">
+                            <span id="hadithSource"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- مشغل الصوت القرآني -->
+            <section class="quran-section">
+                <div class="quran-player" id="quranPlayer">
+                    <div class="player-header">
+                        <i class="fas fa-quran"></i>
+                        <h3>القرآن الكريم</h3>
+                    </div>
+                    <div class="player-info">
+                        <h4 id="surahName">سورة الفاتحة</h4>
+                        <p id="reciterName">الشيخ عبد الباسط عبد الصمد</p>
+                    </div>
+                    <div class="player-controls">
+                        <button id="playPauseBtn" class="control-btn">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress" id="progress"></div>
+                            </div>
+                            <div class="time-info">
+                                <span id="currentTimeAudio">0:00</span>
+                                <span id="durationAudio">0:00</span>
+                            </div>
+                        </div>
+                        <button id="volumeBtn" class="control-btn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                    <audio id="audioPlayer" preload="metadata"></audio>
+                </div>
+            </section>
+
+            <!-- قسم الأدعية الجديد -->
+            <section class="dua-section">
+                <div class="dua-card" id="duaCard">
+                    <div class="dua-header">
+                        <i class="fas fa-hands"></i>
+                        <h3>دعاء</h3>
+                    </div>
+                    <div class="dua-content">
+                        <p id="duaText">جاري تحميل الدعاء...</p>
+                        <div class="dua-source">
+                            <span id="duaSource"></span>
+                        </div>
+                    </div>
+                    <div class="dua-actions">
+                        <button id="newDuaBtn" class="new-dua-btn">
+                            <i class="fas fa-sync-alt"></i>
+                            دعاء جديد
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 مواقيت الصلاة. جميع الحقوق محفوظة.</p>
+            <p>البيانات مقدمة من <a href="https://aladhan.com" target="_blank">Aladhan API</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
