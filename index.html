@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@300;400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body data-theme="default">
     <!-- نافذة طلب الموقع -->
     <div id="locationModal" class="modal">
         <div class="modal-content">
@@ -46,6 +46,9 @@
                     <div class="search-box">
                         <i class="fas fa-search"></i>
                         <input type="text" id="citySearch" placeholder="ابحث عن مدينة...">
+                        <button id="searchBtn" class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
                         <div id="searchSuggestions" class="search-suggestions"></div>
                     </div>
                 </div>
@@ -98,10 +101,6 @@
                         <i class="fas fa-calendar-alt"></i>
                         عرض مواقيت الشهر
                     </button>
-                    <button id="nearbyCitiesBtn" class="feature-btn">
-                        <i class="fas fa-map"></i>
-                        المدن القريبة
-                    </button>
                 </div>
                 
                 <!-- جدول المواقيت الشهرية (مخفي مبدئياً) -->
@@ -114,19 +113,6 @@
                     </div>
                     <div class="calendar-content" id="calendarContent">
                         <!-- سيتم ملء الجدول هنا -->
-                    </div>
-                </div>
-                
-                <!-- قائمة المدن القريبة (مخفية مبدئياً) -->
-                <div id="nearbyCities" class="nearby-cities hidden">
-                    <div class="cities-header">
-                        <h3>المدن القريبة</h3>
-                        <button id="closeCities" class="close-btn">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="cities-content" id="citiesContent">
-                        <!-- سيتم ملء القائمة هنا -->
                     </div>
                 </div>
             </section>
@@ -187,7 +173,7 @@
                 </div>
             </section>
 
-            <!-- قسم الأدعية الجديد -->
+            <!-- قسم الأدعية -->
             <section class="dua-section">
                 <div class="dua-card" id="duaCard">
                     <div class="dua-header">
@@ -208,6 +194,68 @@
                     </div>
                 </div>
             </section>
+
+            <!-- قسم معلومات المنطقة -->
+            <section class="region-info-section">
+                <div class="region-info-card" id="regionInfoCard">
+                    <div class="region-info-header">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>نبذة عن المنطقة</h3>
+                    </div>
+                    <div class="region-info-content">
+                        <p id="regionInfoText">جاري تحميل معلومات المنطقة...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- المسبحة الإلكترونية -->
+            <section class="tasbih-section">
+                <div class="tasbih-card" id="tasbihCard">
+                    <div class="tasbih-header">
+                        <i class="fas fa-circle-notch"></i>
+                        <h3>المسبحة الإلكترونية</h3>
+                    </div>
+                    <div class="tasbih-content">
+                        <div class="tasbih-counter">
+                            <div class="counter-display">
+                                <span id="tasbihCount">0</span>
+                            </div>
+                            <div class="tasbih-button-container">
+                                <button id="tasbihBtn" class="tasbih-btn">
+                                    <i class="fas fa-circle"></i>
+                                </button>
+                            </div>
+                            <div class="tasbih-controls">
+                                <button id="resetTasbih" class="reset-btn">
+                                    <i class="fas fa-undo"></i>
+                                    إعادة تعيين
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- اختيار الثيمات -->
+            <section class="theme-selector">
+                <div class="theme-options">
+                    <div class="theme-option active" data-theme="default" title="الثيم الافتراضي">
+                        <div class="theme-circle default-theme"></div>
+                    </div>
+                    <div class="theme-option" data-theme="ocean" title="ثيم المحيط">
+                        <div class="theme-circle ocean-theme"></div>
+                    </div>
+                    <div class="theme-option" data-theme="sunset" title="ثيم الغروب">
+                        <div class="theme-circle sunset-theme"></div>
+                    </div>
+                    <div class="theme-option" data-theme="forest" title="ثيم الغابة">
+                        <div class="theme-circle forest-theme"></div>
+                    </div>
+                    <div class="theme-option" data-theme="royal" title="ثيم ملكي">
+                        <div class="theme-circle royal-theme"></div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -215,12 +263,10 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2025 مواقيت الصلاة. جميع الحقوق محفوظة.</p>
-            <p>البيانات مقدمة من <a href="https://aladhan.com" target="_blank">Aladhan API</a></p>
         </div>
     </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
-
 
