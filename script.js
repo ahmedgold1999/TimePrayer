@@ -109,6 +109,8 @@ function initializeApp() {
     setupQuranPlayer();
     displayRandomDua();
     setupEventListeners();
+    // تحديث العد التنازلي كل ثانية
+    setInterval(updateNextPrayerCountdown, 1000);
 }
 
 // إعداد مستمعي الأحداث
@@ -224,7 +226,8 @@ async function handleCitySearch(event) {
     
     try {
         // البحث باستخدام GeoDB Cities API
-        const response = await fetch(`http://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${encodeURIComponent(query)}&limit=5&languageCode=ar`);
+        // استخدام HTTPS بدلاً من HTTP لتجنب مشاكل CORS في بعض المتصفحات
+        const response = await fetch(`https://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${encodeURIComponent(query)}&limit=5&languageCode=ar`);
         const data = await response.json();
         
         if (data.data && data.data.length > 0) {
@@ -248,7 +251,7 @@ function displaySearchSuggestions(cities) {
         suggestionItem.className = 'suggestion-item';
         suggestionItem.textContent = `${city.name}, ${city.country}`;
         
-        suggestionItem.addEventListener('click', () => {
+        suggestionItem.addEventListener('mousedown', () => { // استخدام mousedown بدلاً من click لتجنب مشكلة blur
             selectCity(city);
         });
         
@@ -299,7 +302,7 @@ async function getPrayerTimes(lat, lng) {
             currentPrayerTimes = data.data.timings;
             displayPrayerTimes(currentPrayerTimes);
             updateNextPrayer();
-            setInterval(updateNextPrayer, 60000); // تحديث كل دقيقة
+            // لا نستخدم setInterval هنا لتجنب تكرار التحديثات عند تغيير المدينة
         }
     } catch (error) {
         console.error('خطأ في الحصول على مواقيت الصلاة:', error);
@@ -354,7 +357,7 @@ function displayPrayerTimes(timings) {
     });
 }
 
-// تحديث الصلاة القادمة
+// تحديث الصلاة القادمة (تحديد الصلاة القادمة فقط)
 function updateNextPrayer() {
     if (!currentPrayerTimes) return;
     
@@ -370,29 +373,84 @@ function updateNextPrayer() {
     ];
     
     let nextPrayer = null;
+    let nextPrayerIndex = -1;
     
-    for (let prayer of prayers) {
-        const prayerTime = timeToMinutes(prayer.time);
+    for (let i = 0; i < prayers.length; i++) {
+        const prayerTime = timeToMinutes(prayers[i].time);
         if (prayerTime > currentTime) {
-            nextPrayer = prayer;
+            nextPrayer = prayers[i];
+            nextPrayerIndex = i;
             break;
         }
     }
     
     // إذا لم نجد صلاة اليوم، فالصلاة القادمة هي فجر الغد
     if (!nextPrayer) {
-        nextPrayer = prayers[0];
+        nextPrayer = prayers[0]; // فجر الغد
+        nextPrayerIndex = 0;
     }
     
     // تحديث عرض الصلاة القادمة
     document.getElementById('nextPrayerName').textContent = nextPrayer.name;
     document.getElementById('nextPrayerTime').textContent = formatTime(nextPrayer.time);
     
-    // تحديث العد التنازلي
-    updateCountdown(nextPrayer.time);
-    
     // تمييز الصلاة القادمة
     highlightNextPrayer(nextPrayer.key);
+}
+
+// تحديث العد التنازلي للصلاة القادمة
+function updateNextPrayerCountdown() {
+    if (!currentPrayerTimes) return;
+
+    const now = new Date();
+    const currentTimeInMinutes = now.getHours() * 60 + now.getMinutes();
+    const currentSeconds = now.getSeconds();
+
+    const prayers = [
+        { name: 'الفجر', time: currentPrayerTimes.Fajr, key: 'Fajr' },
+        { name: 'الظهر', time: currentPrayerTimes.Dhuhr, key: 'Dhuhr' },
+        { name: 'العصر', time: currentPrayerTimes.Asr, key: 'Asr' },
+        { name: 'المغرب', time: currentPrayerTimes.Maghrib, key: 'Maghrib' },
+        { name: 'العشاء', time: currentPrayerTimes.Isha, key: 'Isha' }
+    ];
+
+    let nextPrayerTimeInMinutes = -1;
+    let nextPrayerName = '';
+
+    // البحث عن الصلاة القادمة
+    for (let i = 0; i < prayers.length; i++) {
+        const prayerTime = timeToMinutes(prayers[i].time);
+        if (prayerTime > currentTimeInMinutes) {
+            nextPrayerTimeInMinutes = prayerTime;
+            nextPrayerName = prayers[i].name;
+            break;
+        }
+    }
+
+    // إذا كانت جميع الصلوات قد مرت لليوم، فالصلاة القادمة هي فجر الغد
+    if (nextPrayerTimeInMinutes === -1) {
+        nextPrayerTimeInMinutes = timeToMinutes(prayers[0].time) + (24 * 60); // فجر الغد
+        nextPrayerName = prayers[0].name;
+    }
+
+    let totalDiffMinutes = nextPrayerTimeInMinutes - currentTimeInMinutes;
+    let totalDiffSeconds = (totalDiffMinutes * 60) - currentSeconds;
+
+    if (totalDiffSeconds < 0) {
+        totalDiffSeconds += (24 * 60 * 60); // إضافة 24 ساعة إذا كان الوقت سالبًا (انتقل لليوم التالي)
+    }
+
+    const hours = Math.floor(totalDiffSeconds / 3600);
+    const minutes = Math.floor((totalDiffSeconds % 3600) / 60);
+    const seconds = totalDiffSeconds % 60;
+
+    const countdownText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('countdownTime').textContent = countdownText;
+
+    // تحديث اسم الصلاة القادمة ووقتها في الواجهة
+    document.getElementById('nextPrayerName').textContent = nextPrayerName;
+    // يجب أن يكون وقت الصلاة القادمة هو الوقت الفعلي للصلاة وليس وقت العد التنازلي
+    // هذا الجزء يتم تحديثه في updateNextPrayer()، لذا لا داعي لتكراره هنا
 }
 
 // تمييز الصلاة القادمة
@@ -415,27 +473,6 @@ function highlightNextPrayer(prayerKey) {
     if (nextCard) {
         nextCard.classList.add('next');
     }
-}
-
-// تحديث العد التنازلي
-function updateCountdown(prayerTime) {
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const prayerMinutes = timeToMinutes(prayerTime);
-    
-    let diff = prayerMinutes - currentMinutes;
-    
-    // إذا كانت الصلاة في اليوم التالي
-    if (diff <= 0) {
-        diff += 24 * 60; // إضافة 24 ساعة
-    }
-    
-    const hours = Math.floor(diff / 60);
-    const minutes = diff % 60;
-    const seconds = 60 - now.getSeconds();
-    
-    const countdownText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    document.getElementById('countdownTime').textContent = countdownText;
 }
 
 // تحويل الوقت إلى دقائق
@@ -499,6 +536,8 @@ async function showMonthlyCalendar() {
         
         if (data.code === 200) {
             displayMonthlyCalendar(data.data);
+        } else {
+            content.innerHTML = `<p>حدث خطأ في تحميل مواقيت الشهر: ${data.status}</p>`;
         }
     } catch (error) {
         console.error('خطأ في جلب مواقيت الشهر:', error);
@@ -528,8 +567,9 @@ function displayMonthlyCalendar(monthData) {
     `;
     
     monthData.forEach(day => {
-        const date = new Date(day.date.gregorian.date);
-        const dayNumber = date.getDate();
+        // التأكد من أن التاريخ موجود وصحيح
+        const gregorianDate = day.date.gregorian.date;
+        const dayNumber = day.date.gregorian.day; // استخدام day مباشرة
         
         tableHTML += `
             <tr>
@@ -568,24 +608,25 @@ async function showNearbyCities() {
     const content = document.getElementById('citiesContent');
     
     if (!userLocation) {
-        content.innerHTML = '<p>يرجى السماح بتحديد الموقع أولاً</p>';
+        content.innerHTML = '<p>يرجى السماح بتحديد الموقع أولاً لعرض المدن القريبة.</p>';
         cities.classList.remove('hidden');
         return;
     }
     
     try {
         // جلب المدن القريبة باستخدام GeoDB Cities API
-        const response = await fetch(`http://geodb-free-service.wirefreethought.com/v1/geo/locations/${userLocation.latitude}${userLocation.longitude >= 0 ? '+' : ''}${userLocation.longitude}/nearbyPlaces?radius=100&limit=10&types=CITY`);
+        // استخدام HTTPS بدلاً من HTTP لتجنب مشاكل CORS في بعض المتصفحات
+        const response = await fetch(`https://geodb-free-service.wirefreethought.com/v1/geo/locations/${userLocation.latitude}${userLocation.longitude >= 0 ? '+' : ''}${userLocation.longitude}/nearbyPlaces?radius=100&limit=10&types=CITY&languageCode=ar`);
         const data = await response.json();
         
         if (data.data && data.data.length > 0) {
             displayNearbyCities(data.data);
         } else {
-            content.innerHTML = '<p>لم يتم العثور على مدن قريبة</p>';
+            content.innerHTML = '<p>لم يتم العثور على مدن قريبة.</p>';
         }
     } catch (error) {
         console.error('خطأ في جلب المدن القريبة:', error);
-        content.innerHTML = '<p>حدث خطأ في تحميل المدن القريبة</p>';
+        content.innerHTML = '<p>حدث خطأ في تحميل المدن القريبة. يرجى التأكد من اتصال الإنترنت.</p>';
     }
     
     cities.classList.remove('hidden');
@@ -625,13 +666,9 @@ function selectNearbyCity(city) {
     getPrayerTimes(city.latitude, city.longitude);
 }
 
-// إخفاء المدن القريبة
-function hideNearbyCities() {
-    document.getElementById('nearbyCities').classList.add('hidden');
-}
-
 // طباعة المواقيت
 function printPrayerTimes() {
+    // إخفاء العناصر غير المرغوب فيها عند الطباعة باستخدام CSS
     window.print();
 }
 
