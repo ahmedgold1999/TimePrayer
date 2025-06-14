@@ -1,3 +1,4 @@
+// متغيرات عامة
 let userLocation = null;
 let currentPrayerTimes = null;
 let audioPlayer = null;
@@ -31,32 +32,32 @@ const hadiths = [
     }
 ];
 
-// مصفوفة السور القرآنية
+// مصفوفة السور القرآنية - استخدام مصادر محلية أو مختلفة
 const quranSurahs = [
     {
         name: "سورة الفاتحة",
         reciter: "الشيخ عبد الباسط عبد الصمد",
-        url: "https://server8.mp3quran.net/abd_basit/001.mp3"
+        url: "https://download.quranicaudio.com/quran/abdul_basit_murattal/001.mp3"
     },
     {
         name: "سورة البقرة",
         reciter: "الشيخ ماهر المعيقلي",
-        url: "https://server8.mp3quran.net/maher/002.mp3"
+        url: "https://download.quranicaudio.com/quran/maher_al_mueaqly/002.mp3"
     },
     {
         name: "سورة آل عمران",
         reciter: "الشيخ سعد الغامدي",
-        url: "https://server7.mp3quran.net/s_gmd/003.mp3"
+        url: "https://download.quranicaudio.com/quran/sa3d_al-ghaamidi/003.mp3"
     },
     {
         name: "سورة يس",
         reciter: "الشيخ عبد الرحمن السديس",
-        url: "https://server11.mp3quran.net/sds/036.mp3"
+        url: "https://download.quranicaudio.com/quran/abdurrahmaan_as-sudays/036.mp3"
     },
     {
         name: "سورة الرحمن",
         reciter: "الشيخ مشاري العفاسي",
-        url: "https://server8.mp3quran.net/afs/055.mp3"
+        url: "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee/055.mp3"
     }
 ];
 
@@ -124,20 +125,18 @@ function setupEventListeners() {
     document.getElementById('allowLocation').addEventListener('click', requestLocation);
     document.getElementById('denyLocation').addEventListener('click', useDefaultLocation);
     
-    // البحث عن المدن
+    // البحث عن المدن - تم تبسيط البحث
     const citySearch = document.getElementById('citySearch');
     const searchBtn = document.getElementById('searchBtn');
     
-    citySearch.addEventListener('input', handleCitySearch);
-    citySearch.addEventListener('focus', showSearchSuggestions);
-    citySearch.addEventListener('blur', hideSearchSuggestions);
+    // إزالة البحث التلقائي المعقد وإبقاء البحث البسيط فقط
     citySearch.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            performSearch();
+            performSimpleSearch();
         }
     });
     
-    searchBtn.addEventListener('click', performSearch);
+    searchBtn.addEventListener('click', performSimpleSearch);
     
     // أزرار الميزات الإضافية
     document.getElementById('monthlyCalendarBtn').addEventListener('click', toggleMonthlyCalendar);
@@ -217,9 +216,6 @@ function incrementTasbih() {
         btn.style.transform = 'scale(1)';
         counter.style.transform = 'scale(1)';
     }, 150);
-    
-    // تأثير صوتي بسيط (اختياري)
-    playTasbihSound();
 }
 
 // إعادة تعيين المسبحة
@@ -254,48 +250,44 @@ function loadSavedTasbihCount() {
     }
 }
 
-// تشغيل صوت المسبحة (اختياري)
-function playTasbihSound() {
-    // يمكن إضافة صوت بسيط هنا إذا أردت
-    // const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
-}
-
-// تنفيذ البحث
-function performSearch() {
+// بحث مبسط بدون API خارجي
+function performSimpleSearch() {
     const query = document.getElementById('citySearch').value.trim();
     if (query.length < 2) {
         alert('يرجى إدخال اسم المدينة للبحث');
         return;
     }
     
-    searchForCity(query);
-}
-
-// البحث عن مدينة
-async function searchForCity(query) {
-    try {
-        // البحث باستخدام GeoDB Cities API
-        const response = await fetch(`https://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${encodeURIComponent(query)}&limit=10&languageCode=ar`);
-        const data = await response.json();
-        
-        if (data.data && data.data.length > 0) {
-            displaySearchSuggestions(data.data);
-        } else {
-            // إذا لم نجد نتائج بالعربية، نجرب بالإنجليزية
-            const englishResponse = await fetch(`https://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${encodeURIComponent(query)}&limit=10`);
-            const englishData = await englishResponse.json();
-            
-            if (englishData.data && englishData.data.length > 0) {
-                displaySearchSuggestions(englishData.data);
-            } else {
-                alert('لم يتم العثور على المدينة المطلوبة');
-                hideSearchSuggestions();
-            }
-        }
-    } catch (error) {
-        console.error('خطأ في البحث عن المدن:', error);
-        alert('حدث خطأ أثناء البحث، يرجى المحاولة مرة أخرى');
-        hideSearchSuggestions();
+    // قائمة مدن مبسطة
+    const cities = {
+        'الرياض': { name: 'الرياض', country: 'السعودية' },
+        'جدة': { name: 'جدة', country: 'السعودية' },
+        'مكة': { name: 'مكة المكرمة', country: 'السعودية' },
+        'المدينة': { name: 'المدينة المنورة', country: 'السعودية' },
+        'الدمام': { name: 'الدمام', country: 'السعودية' },
+        'القاهرة': { name: 'القاهرة', country: 'مصر' },
+        'الإسكندرية': { name: 'الإسكندرية', country: 'مصر' },
+        'دبي': { name: 'دبي', country: 'الإمارات' },
+        'أبوظبي': { name: 'أبوظبي', country: 'الإمارات' },
+        'الكويت': { name: 'الكويت', country: 'الكويت' },
+        'الدوحة': { name: 'الدوحة', country: 'قطر' },
+        'المنامة': { name: 'المنامة', country: 'البحرين' },
+        'مسقط': { name: 'مسقط', country: 'عمان' },
+        'عمان': { name: 'عمان', country: 'الأردن' },
+        'بيروت': { name: 'بيروت', country: 'لبنان' },
+        'دمشق': { name: 'دمشق', country: 'سوريا' },
+        'بغداد': { name: 'بغداد', country: 'العراق' },
+        'الرباط': { name: 'الرباط', country: 'المغرب' },
+        'تونس': { name: 'تونس', country: 'تونس' },
+        'الجزائر': { name: 'الجزائر', country: 'الجزائر' }
+    };
+    
+    const foundCity = cities[query] || cities[query.toLowerCase()];
+    
+    if (foundCity) {
+        selectCity(foundCity);
+    } else {
+        alert('المدينة غير موجودة في القائمة. يرجى المحاولة مع مدينة أخرى.');
     }
 }
 
@@ -375,78 +367,17 @@ function updateLocationDisplay() {
     document.getElementById('countryName').textContent = currentCountry;
 }
 
-// البحث عن المدن
-async function handleCitySearch(event) {
-    const query = event.target.value.trim();
-    
-    if (query.length < 2) {
-        hideSearchSuggestions();
-        return;
-    }
-    
-    try {
-        // البحث باستخدام GeoDB Cities API
-        const response = await fetch(`https://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=${encodeURIComponent(query)}&limit=5&languageCode=ar`);
-        const data = await response.json();
-        
-        if (data.data && data.data.length > 0) {
-            displaySearchSuggestions(data.data);
-        } else {
-            hideSearchSuggestions();
-        }
-    } catch (error) {
-        console.error('خطأ في البحث عن المدن:', error);
-        hideSearchSuggestions();
-    }
-}
-
-// عرض اقتراحات البحث
-function displaySearchSuggestions(cities) {
-    const suggestionsContainer = document.getElementById('searchSuggestions');
-    suggestionsContainer.innerHTML = '';
-    
-    cities.forEach(city => {
-        const suggestionItem = document.createElement('div');
-        suggestionItem.className = 'suggestion-item';
-        suggestionItem.textContent = `${city.name}, ${city.country}`;
-        
-        suggestionItem.addEventListener('mousedown', () => {
-            selectCity(city);
-        });
-        
-        suggestionsContainer.appendChild(suggestionItem);
-    });
-    
-    suggestionsContainer.classList.add('show');
-}
-
-// اختيار مدينة من الاقتراحات
+// اختيار مدينة من البحث
 function selectCity(city) {
     currentCity = city.name;
     currentCountry = city.country;
     
     document.getElementById('citySearch').value = `${city.name}, ${city.country}`;
-    hideSearchSuggestions();
     updateLocationDisplay();
     
     // تحديث مواقيت الصلاة للمدينة الجديدة
     getPrayerTimesByCity(city.name, city.country);
     loadRegionInfo(city.name);
-}
-
-// إظهار اقتراحات البحث
-function showSearchSuggestions() {
-    const suggestionsContainer = document.getElementById('searchSuggestions');
-    if (suggestionsContainer.children.length > 0) {
-        suggestionsContainer.classList.add('show');
-    }
-}
-
-// إخفاء اقتراحات البحث
-function hideSearchSuggestions() {
-    setTimeout(() => {
-        document.getElementById('searchSuggestions').classList.remove('show');
-    }, 200);
 }
 
 // تحميل معلومات المنطقة من ويكيبديا
@@ -709,13 +640,25 @@ function setupQuranPlayer() {
     loadRandomSurah();
     
     // أزرار التحكم
-    playPauseBtn.addEventListener('click', togglePlayPause);
-    volumeBtn.addEventListener('click', toggleMute);
-    progressBar.addEventListener('click', seekAudio);
+    if (playPauseBtn) {
+        playPauseBtn.addEventListener('click', togglePlayPause);
+    }
+    if (volumeBtn) {
+        volumeBtn.addEventListener('click', toggleMute);
+    }
+    if (progressBar) {
+        progressBar.addEventListener('click', seekAudio);
+    }
     
     // تحديث التقدم
-    audioPlayer.addEventListener('timeupdate', updateProgress);
-    audioPlayer.addEventListener('loadedmetadata', updateDuration);
+    if (audioPlayer) {
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('loadedmetadata', updateDuration);
+        audioPlayer.addEventListener('error', handleAudioError);
+        audioPlayer.addEventListener('canplay', handleAudioReady);
+        audioPlayer.addEventListener('loadstart', handleAudioLoadStart);
+        audioPlayer.addEventListener('loadeddata', handleAudioLoadedData);
+    }
 }
 
 // تحميل سورة عشوائية
@@ -725,27 +668,119 @@ function loadRandomSurah() {
     
     document.getElementById('surahName').textContent = surah.name;
     document.getElementById('reciterName').textContent = surah.reciter;
-    audioPlayer.src = surah.url;
+    
+    if (audioPlayer) {
+        // إعادة تعيين حالة المشغل
+        isPlaying = false;
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        if (playPauseBtn) {
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+        }
+        
+        // تحديث مصدر الصوت
+        audioPlayer.src = surah.url;
+        audioPlayer.load(); // إعادة تحميل الصوت
+        
+        // إظهار رسالة التحميل
+        document.getElementById('surahName').textContent = 'جاري تحميل السورة...';
+        document.getElementById('reciterName').textContent = 'يرجى الانتظار';
+    }
+}
+
+// معالجة بداية تحميل الصوت
+function handleAudioLoadStart() {
+    console.log('بدء تحميل الصوت...');
+    document.getElementById('surahName').textContent = 'جاري تحميل السورة...';
+    document.getElementById('reciterName').textContent = 'يرجى الانتظار';
+}
+
+// معالجة تحميل بيانات الصوت
+function handleAudioLoadedData() {
+    console.log('تم تحميل بيانات الصوت');
+    // إعادة عرض معلومات السورة الصحيحة
+    const currentSrc = audioPlayer.src;
+    for (let i = 0; i < quranSurahs.length; i++) {
+        if (currentSrc.includes(quranSurahs[i].url)) {
+            document.getElementById('surahName').textContent = quranSurahs[i].name;
+            document.getElementById('reciterName').textContent = quranSurahs[i].reciter;
+            break;
+        }
+    }
+}
+
+// معالجة خطأ الصوت
+function handleAudioError(e) {
+    console.error('خطأ في تحميل الصوت:', e);
+    console.error('تفاصيل الخطأ:', audioPlayer.error);
+    
+    // تجربة سورة أخرى
+    const currentSrc = audioPlayer.src;
+    let nextSurahIndex = 0;
+    
+    // البحث عن السورة التالية
+    for (let i = 0; i < quranSurahs.length; i++) {
+        if (currentSrc.includes(quranSurahs[i].url)) {
+            nextSurahIndex = (i + 1) % quranSurahs.length;
+            break;
+        }
+    }
+    
+    const nextSurah = quranSurahs[nextSurahIndex];
+    
+    // تحديث المعلومات
+    document.getElementById('surahName').textContent = nextSurah.name;
+    document.getElementById('reciterName').textContent = nextSurah.reciter;
+    
+    // تحديث المصدر
+    audioPlayer.src = nextSurah.url;
+    audioPlayer.load();
+    
+    console.log('تم التبديل إلى سورة أخرى:', nextSurah.name);
+}
+
+// معالجة جاهزية الصوت
+function handleAudioReady() {
+    console.log('الصوت جاهز للتشغيل');
+    // التأكد من عرض معلومات السورة الصحيحة
+    const currentSrc = audioPlayer.src;
+    for (let i = 0; i < quranSurahs.length; i++) {
+        if (currentSrc.includes(quranSurahs[i].url)) {
+            document.getElementById('surahName').textContent = quranSurahs[i].name;
+            document.getElementById('reciterName').textContent = quranSurahs[i].reciter;
+            break;
+        }
+    }
 }
 
 // تشغيل/إيقاف الصوت
 function togglePlayPause() {
     const playPauseBtn = document.getElementById('playPauseBtn');
     
+    if (!audioPlayer || !audioPlayer.src) {
+        alert('لا يوجد ملف صوتي للتشغيل');
+        return;
+    }
+    
     if (isPlaying) {
         audioPlayer.pause();
         playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
         isPlaying = false;
     } else {
-        audioPlayer.play();
-        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        isPlaying = true;
+        audioPlayer.play().then(() => {
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            isPlaying = true;
+        }).catch(error => {
+            console.error('خطأ في تشغيل الصوت:', error);
+            alert('لا يمكن تشغيل الملف الصوتي');
+        });
     }
 }
 
 // كتم/إلغاء كتم الصوت
 function toggleMute() {
     const volumeBtn = document.getElementById('volumeBtn');
+    
+    if (!audioPlayer) return;
     
     if (audioPlayer.muted) {
         audioPlayer.muted = false;
@@ -758,6 +793,8 @@ function toggleMute() {
 
 // البحث في الصوت
 function seekAudio(e) {
+    if (!audioPlayer || !audioPlayer.duration) return;
+    
     const progressBar = e.currentTarget;
     const clickX = e.offsetX;
     const width = progressBar.offsetWidth;
@@ -770,6 +807,8 @@ function seekAudio(e) {
 function updateProgress() {
     const progress = document.getElementById('progress');
     const currentTimeSpan = document.getElementById('currentTimeAudio');
+    
+    if (!audioPlayer || !progress || !currentTimeSpan) return;
     
     const currentTime = audioPlayer.currentTime;
     const duration = audioPlayer.duration;
@@ -785,11 +824,15 @@ function updateProgress() {
 // تحديث مدة الصوت
 function updateDuration() {
     const durationSpan = document.getElementById('durationAudio');
-    durationSpan.textContent = formatAudioTime(audioPlayer.duration);
+    if (durationSpan && audioPlayer) {
+        durationSpan.textContent = formatAudioTime(audioPlayer.duration);
+    }
 }
 
 // تنسيق وقت الصوت
 function formatAudioTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
@@ -839,14 +882,97 @@ function hideMonthlyCalendar() {
 
 // تحميل مواقيت الشهر
 async function loadMonthlyPrayerTimes() {
-    // يمكن تنفيذ هذه الوظيفة لاحقاً لتحميل مواقيت الشهر كاملاً
     const calendarContent = document.getElementById('calendarContent');
     calendarContent.innerHTML = '<p>جاري تحميل مواقيت الشهر...</p>';
     
-    // مثال بسيط لعرض رسالة
-    setTimeout(() => {
-        calendarContent.innerHTML = '<p>ميزة عرض مواقيت الشهر ستكون متاحة قريباً</p>';
-    }, 1000);
+    try {
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+        
+        let apiUrl;
+        
+        // استخدام الإحداثيات إذا كانت متوفرة، وإلا استخدام اسم المدينة
+        if (userLocation && userLocation.latitude && userLocation.longitude) {
+            apiUrl = `https://api.aladhan.com/v1/calendar/${currentYear}/${currentMonth}?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}&method=4`;
+        } else {
+            apiUrl = `https://api.aladhan.com/v1/calendarByCity/${currentYear}/${currentMonth}?city=${encodeURIComponent(currentCity)}&country=${encodeURIComponent(currentCountry)}&method=4`;
+        }
+        
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+            displayMonthlyCalendar(data.data);
+        } else {
+            throw new Error('فشل في تحميل البيانات');
+        }
+    } catch (error) {
+        console.error('خطأ في تحميل مواقيت الشهر:', error);
+        calendarContent.innerHTML = `
+            <div class="error-message">
+                <p>عذراً، حدث خطأ في تحميل مواقيت الشهر</p>
+                <p>يرجى المحاولة مرة أخرى لاحقاً</p>
+            </div>
+        `;
+    }
+}
+
+// عرض التقويم الشهري
+function displayMonthlyCalendar(monthData) {
+    const calendarContent = document.getElementById('calendarContent');
+    
+    let calendarHTML = `
+        <div class="monthly-calendar">
+            <table class="prayer-times-table">
+                <thead>
+                    <tr>
+                        <th>التاريخ</th>
+                        <th>الفجر</th>
+                        <th>الظهر</th>
+                        <th>العصر</th>
+                        <th>المغرب</th>
+                        <th>العشاء</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    monthData.forEach(dayData => {
+        const date = dayData.date.gregorian;
+        const timings = dayData.timings;
+        
+        calendarHTML += `
+            <tr>
+                <td class="date-cell">
+                    <div class="gregorian-date">${date.day} ${getMonthNameArabic(date.month.number)}</div>
+                    <div class="hijri-date">${dayData.date.hijri.day} ${dayData.date.hijri.month.ar}</div>
+                </td>
+                <td>${formatTime(timings.Fajr)}</td>
+                <td>${formatTime(timings.Dhuhr)}</td>
+                <td>${formatTime(timings.Asr)}</td>
+                <td>${formatTime(timings.Maghrib)}</td>
+                <td>${formatTime(timings.Isha)}</td>
+            </tr>
+        `;
+    });
+    
+    calendarHTML += `
+                </tbody>
+            </table>
+        </div>
+    `;
+    
+    calendarContent.innerHTML = calendarHTML;
+}
+
+// الحصول على اسم الشهر بالعربية
+function getMonthNameArabic(monthNumber) {
+    const months = [
+        '', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    return months[monthNumber] || '';
 }
 
 // طباعة المواقيت
